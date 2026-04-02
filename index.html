@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>familea — Das Schicksal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #050505; overflow: hidden; font-family: 'Cormorant Garamond', serif; }
+canvas#bg { position: fixed; inset: 0; z-index: 0; }
+
+/* ── LAYOUT ── */
+.scene {
+position: relative; z-index: 10;
+height: 100vh;
+display: flex; flex-direction: column;
+align-items: center; justify-content: center;
+padding: 20px 20px 0;
+gap: 0;
+}
+
+/* ── EYEBROW ── */
+.eyebrow {
+font-family: ‘Cinzel’, serif;
+font-size: 0.6rem; letter-spacing: 0.42em;
+color: rgba(255,255,255,0.35); text-transform: uppercase;
+margin-bottom: 16px; opacity: 0;
+animation: fadeUp 1.4s ease 0.2s forwards;
+}
+
+/* ── TITLE ── */
+.title-block {
+text-align: center; margin-bottom: 16px;
+opacity: 0; animation: fadeUp 1.4s ease 0.4s forwards;
+}
+.title-main {
+font-family: ‘Cinzel’, serif;
+font-size: clamp(1.8rem, 5vw, 3rem);
+font-weight: 600; color: #fff;
+letter-spacing: 0.14em; line-height: 1;
+}
+.title-sub {
+font-size: clamp(0.9rem, 2vw, 1.1rem);
+font-weight: 300; font-style: italic;
+color: rgba(255,255,255,0.55); margin-top: 8px;
+}
+
+/* ── DIVIDER ── */
+.divider {
+display: flex; align-items: center; gap: 14px;
+margin-bottom: 16px; opacity: 0;
+animation: fadeUp 1.4s ease 0.6s forwards;
+}
+.dl { width: 50px; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,168,74,0.5)); }
+.dr { width: 50px; height: 1px; background: linear-gradient(90deg, rgba(212,168,74,0.5), transparent); }
+.dd { width: 5px; height: 5px; background: #D4A84A; transform: rotate(45deg); box-shadow: 0 0 10px rgba(212,168,74,0.8); }
+
+/* ── WHEEL ── */
+.wheel-wrap {
+opacity: 0; animation: fadeUp 1.4s ease 0.8s forwards;
+margin-bottom: 14px; cursor: pointer;
+display: flex; flex-direction: column; align-items: center;
+}
+.wheel-wrap:active { transform: scale(0.97); }
+.wheel-hint {
+margin-top: 7px;
+font-family: ‘Cinzel’, serif; font-size: 0.5rem;
+letter-spacing: 0.5em; color: rgba(212,168,74,0.55);
+text-transform: uppercase; white-space: nowrap;
+transition: color 0.3s, opacity 0.4s;
+}
+.wheel-wrap:hover .wheel-hint { color: rgba(212,168,74,1); }
+canvas#wheel { display: block; }
+
+/* ── RESULT ── */
+.result-area {
+text-align: center; max-width: 480px; width: 100%;
+opacity: 0; animation: fadeUp 1.4s ease 1s forwards;
+display: flex; flex-direction: column; align-items: center; gap: 7px;
+padding: 16px 24px 14px; min-height: 100px; justify-content: center;
+border-top: 1px solid rgba(255,255,255,0.07);
+border-bottom: 1px solid rgba(255,255,255,0.07);
+transition: border-color 0.6s; margin-bottom: 0;
+}
+.result-area.active-result { border-color: rgba(212,168,74,0.25); }
+.result-verdict {
+font-family: ‘Cinzel’, serif; font-size: 0.68rem;
+letter-spacing: 0.38em; color: #D4A84A;
+text-transform: uppercase; transition: opacity 0.3s;
+}
+.result-text {
+font-size: clamp(0.95rem, 2.2vw, 1.18rem);
+font-weight: 400; font-style: italic; color: #fff;
+line-height: 1.75; transition: opacity 0.3s, transform 0.3s;
+}
+.fact-chip {
+font-size: 0.68rem; font-style: normal;
+color: rgba(255,255,255,0.32); transition: opacity 0.3s;
+}
+.result-area.fading .result-verdict,
+.result-area.fading .result-text,
+.result-area.fading .fact-chip { opacity: 0; transform: translateY(5px); }
+
+/* ── BAROMETER PANEL ── */
+.baro-panel {
+position: fixed; bottom: 0; left: 0; right: 0;
+background: linear-gradient(0deg, rgba(5,5,5,0.98) 60%, transparent 100%);
+padding: 12px 20px 16px;
+opacity: 0; animation: fadeUp 1.4s ease 1.2s forwards;
+z-index: 20;
+}
+
+.baro-title {
+font-family: ‘Cinzel’, serif; font-size: 0.48rem;
+letter-spacing: 0.38em; color: rgba(255,255,255,0.25);
+text-transform: uppercase; text-align: center; margin-bottom: 10px;
+}
+
+.baro-grid {
+display: grid; grid-template-columns: 1fr 1fr;
+gap: 8px 16px; max-width: 500px; margin: 0 auto;
+}
+
+.baro-item { display: flex; flex-direction: column; gap: 4px; }
+
+.baro-header {
+display: flex; justify-content: space-between; align-items: baseline;
+}
+.baro-name {
+font-family: ‘Cinzel’, serif; font-size: 0.55rem;
+letter-spacing: 0.18em; text-transform: uppercase;
+font-weight: 600;
+}
+.baro-val {
+font-family: ‘Cinzel’, serif; font-size: 0.52rem;
+letter-spacing: 0.05em;
+}
+.baro-sub {
+font-size: 0.58rem; font-style: italic;
+color: rgba(255,255,255,0.28); margin-top: -2px;
+font-family: ‘Cormorant Garamond’, serif;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Track */
+.baro-track {
+height: 3px; border-radius: 2px;
+background: rgba(255,255,255,0.08);
+position: relative; cursor: pointer;
+touch-action: none;
+}
+.baro-track:hover { background: rgba(255,255,255,0.14); }
+.baro-fill {
+position: absolute; left: 0; top: 0; height: 100%;
+border-radius: 2px;
+transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.baro-thumb {
+position: absolute; top: 50%; transform: translate(-50%,-50%);
+width: 10px; height: 10px; border-radius: 50%;
+border: 1px solid rgba(255,255,255,0.3);
+cursor: grab; transition: left 0.4s cubic-bezier(0.4,0,0.2,1);
+box-shadow: 0 0 6px rgba(0,0,0,0.5);
+}
+
+/* Person colours */
+.baro-timmy  .baro-name { color: #FF6B6B; }
+.baro-timmy  .baro-val  { color: #FF6B6B; }
+.baro-timmy  .baro-fill { background: linear-gradient(90deg,#8B0000,#FF6B6B); }
+.baro-timmy  .baro-thumb { background: #FF6B6B; box-shadow: 0 0 8px rgba(255,107,107,0.6); }
+
+.baro-aron   .baro-name { color: #D4A84A; }
+.baro-aron   .baro-val  { color: #D4A84A; }
+.baro-aron   .baro-fill { background: linear-gradient(90deg,#5A4010,#D4A84A); }
+.baro-aron   .baro-thumb { background: #D4A84A; box-shadow: 0 0 8px rgba(212,168,74,0.6); }
+
+.baro-colin  .baro-name { color: #6AB4D0; }
+.baro-colin  .baro-val  { color: #6AB4D0; }
+.baro-colin  .baro-fill { background: linear-gradient(90deg,#1A3A4A,#6AB4D0); }
+.baro-colin  .baro-thumb { background: #6AB4D0; box-shadow: 0 0 8px rgba(106,180,208,0.6); }
+
+.baro-kevin  .baro-name { color: #9B6EA8; }
+.baro-kevin  .baro-val  { color: #9B6EA8; }
+.baro-kevin  .baro-fill { background: linear-gradient(90deg,#2A1A3A,#9B6EA8); }
+.baro-kevin  .baro-thumb { background: #9B6EA8; box-shadow: 0 0 8px rgba(155,110,168,0.6); }
+
+.footer-note {
+font-size: 0.42rem; letter-spacing: 0.07em;
+color: rgba(255,255,255,0.14); font-style: italic;
+text-align: center; margin-top: 8px;
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(12px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="scene">
+  <div class="eyebrow">familea · Pionierin seit 1901 · Basel</div>
+
+  <div class="title-block">
+    <div class="title-main">Das Schicksal</div>
+    <div class="title-sub">Kommt Timmy — und was bleibt von Aron?</div>
+  </div>
+
+  <div class="divider">
+    <div class="dl"></div><div class="dd"></div><div class="dr"></div>
+  </div>
+
+  <div class="wheel-wrap" id="wheelWrap" onclick="spin()">
+    <canvas id="wheel" width="120" height="120"></canvas>
+    <div class="wheel-hint" id="wheelHint">Drücken</div>
+  </div>
+
+  <div class="result-area" id="resultArea">
+    <div class="result-verdict" id="verdict">Das Orakel schweigt noch.</div>
+    <div class="result-text" id="resultText">Schieberegler setzen, dann Rad drücken.</div>
+    <div class="fact-chip" id="factChip">familea betreibt über 40 Kitas in der Region Basel.</div>
+  </div>
+</div>
+
+<!-- BAROMETER PANEL -->
+
+<div class="baro-panel">
+  <div class="baro-title">Personen-Barometer — ziehen zum Einstellen</div>
+  <div class="baro-grid">
+
+```
+<!-- TIMMY -->
+<div class="baro-item baro-timmy">
+  <div class="baro-header">
+    <span class="baro-name">Timmy</span>
+    <span class="baro-val" id="vTimmy">50%</span>
+  </div>
+  <div class="baro-sub" id="sTimmy">Kommt er oder nicht?</div>
+  <div class="baro-track" id="tTimmy">
+    <div class="baro-fill" id="fTimmy" style="width:50%"></div>
+    <div class="baro-thumb" id="thTimmy" style="left:50%"></div>
+  </div>
+</div>
+
+<!-- ARON -->
+<div class="baro-item baro-aron">
+  <div class="baro-header">
+    <span class="baro-name">Aron</span>
+    <span class="baro-val" id="vAron">50%</span>
+  </div>
+  <div class="baro-sub" id="sAron">Geschäftsleitung → Chef?</div>
+  <div class="baro-track" id="tAron">
+    <div class="baro-fill" id="fAron" style="width:50%"></div>
+    <div class="baro-thumb" id="thAron" style="left:50%"></div>
+  </div>
+</div>
+
+<!-- COLIN -->
+<div class="baro-item baro-colin">
+  <div class="baro-header">
+    <span class="baro-name">Colin</span>
+    <span class="baro-val" id="vColin">50%</span>
+  </div>
+  <div class="baro-sub" id="sColin">Sicherer Hafen oder doch GL?</div>
+  <div class="baro-track" id="tColin">
+    <div class="baro-fill" id="fColin" style="width:50%"></div>
+    <div class="baro-thumb" id="thColin" style="left:50%"></div>
+  </div>
+</div>
+
+<!-- KEVIN -->
+<div class="baro-item baro-kevin">
+  <div class="baro-header">
+    <span class="baro-name">Kevin</span>
+    <span class="baro-val" id="vKevin">20%</span>
+  </div>
+  <div class="baro-sub" id="sKevin">FABE-Betreuung droht</div>
+  <div class="baro-track" id="tKevin">
+    <div class="baro-fill" id="fKevin" style="width:20%"></div>
+    <div class="baro-thumb" id="thKevin" style="left:20%"></div>
+  </div>
+</div>
+```
+
+  </div>
+  <div class="footer-note">Nicht autorisiert. Aron haftet nicht. Timmy schon. familea seit 1901.</div>
+</div>
+
+<script>
+/* ── BACKGROUND ── */
+(function () {
+  const c = document.getElementById('bg');
+  const ctx = c.getContext('2d');
+  let W, H, t = 0;
+  function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const blobs = [
+    { cx:0.12, cy:0.18, r:0.32, color:[45,191,184],  speed:0.28, phase:0   },
+    { cx:0.88, cy:0.14, r:0.28, color:[244,135,75],   speed:0.22, phase:1.5 },
+    { cx:0.80, cy:0.78, r:0.30, color:[155,110,168],  speed:0.18, phase:3.0 },
+    { cx:0.14, cy:0.84, r:0.25, color:[232,125,168],  speed:0.25, phase:4.5 },
+    { cx:0.50, cy:0.50, r:0.18, color:[106,180,208],  speed:0.32, phase:2.0 },
+  ];
+  function draw() {
+    ctx.fillStyle='#050505'; ctx.fillRect(0,0,W,H);
+    blobs.forEach(b => {
+      const pulse = 0.5+0.5*Math.sin(t*b.speed+b.phase);
+      const x = W*(b.cx+0.03*Math.sin(t*b.speed*0.7+b.phase));
+      const y = H*(b.cy+0.03*Math.cos(t*b.speed*0.5+b.phase));
+      const r = Math.min(W,H)*(b.r+pulse*0.04);
+      const alpha = 0.22+pulse*0.12;
+      const g = ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0, `rgba(${b.color},${alpha})`);
+      g.addColorStop(0.5,`rgba(${b.color},${alpha*0.4})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    });
+    t+=0.012; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── WHEEL ── */
+(function () {
+  const c = document.getElementById('wheel');
+  const ctx = c.getContext('2d');
+  const S=120, cx=60, cy=60, R=44, TEETH=16;
+  let angle=0, speed=0, spinning=false, stopAt=null, onDone=null, hovered=false;
+  const wrap = document.getElementById('wheelWrap');
+  wrap.addEventListener('mouseenter',()=>hovered=true);
+  wrap.addEventListener('mouseleave',()=>hovered=false);
+
+  function draw() {
+    ctx.clearRect(0,0,S,S);
+    if(hovered&&!spinning){
+      const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,R+12);
+      glow.addColorStop(0,'rgba(212,168,74,0.08)'); glow.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=glow; ctx.fillRect(0,0,S,S);
+    }
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+    const al=spinning?0.95:0.72;
+    ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(212,168,74,${spinning?0.55:0.28})`; ctx.lineWidth=0.8; ctx.stroke();
+    for(let i=0;i<TEETH;i++){
+      const a=(i/TEETH)*Math.PI*2,tH=6,tW=0.10;
+      ctx.save(); ctx.rotate(a);
+      ctx.beginPath(); ctx.moveTo(R-tH,-tW*R); ctx.lineTo(R,-tW*R*0.55);
+      ctx.lineTo(R,tW*R*0.55); ctx.lineTo(R-tH,tW*R);
+      ctx.closePath(); ctx.fillStyle=`rgba(212,168,74,${al})`; ctx.fill(); ctx.restore();
+    }
+    for(let i=0;i<6;i++){
+      const a=(i/6)*Math.PI*2;
+      ctx.beginPath(); ctx.moveTo(8*Math.cos(a),8*Math.sin(a));
+      ctx.lineTo((R-8)*Math.cos(a),(R-8)*Math.sin(a));
+      ctx.strokeStyle=`rgba(212,168,74,${spinning?0.3:0.14})`; ctx.lineWidth=0.7; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0,0,R*0.48,0,Math.PI*2);
+    ctx.strokeStyle=`rgba(212,168,74,${spinning?0.45:0.22})`; ctx.lineWidth=0.7; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,3.5,0,Math.PI*2);
+    ctx.fillStyle=`rgba(212,168,74,${al})`; ctx.fill();
+    ctx.restore();
+    ctx.save(); ctx.translate(cx,cy);
+    ctx.beginPath(); ctx.moveTo(0,-(R+9)); ctx.lineTo(0,-(R-1));
+    ctx.strokeStyle=`rgba(212,168,74,${spinning?0.85:0.38})`; ctx.lineWidth=1.2; ctx.stroke();
+    ctx.restore();
+  }
+
+  let last=null;
+  function loop(ts){
+    if(!last) last=ts;
+    const dt=Math.min((ts-last)/1000,0.05); last=ts;
+    if(spinning){
+      if(stopAt!==null&&ts>=stopAt){
+        speed*=Math.pow(0.93,dt*60);
+        if(speed<0.003){speed=0;spinning=false;if(onDone){onDone();onDone=null;}}
+      }
+      angle+=speed*dt;
+    }
+    draw(); requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  window.triggerWheel=function(dur,cb){speed=15+Math.random()*5;spinning=true;stopAt=performance.now()+dur;onDone=cb;};
+})();
+
+/* ── BAROMETERS ── */
+const baros = {
+  Timmy: { val:50, fill:'fTimmy', thumb:'thTimmy', track:'tTimmy', label:'vTimmy', sub:'sTimmy',
+    subs: v => v<20?'Wahrscheinlich krank':v<40?'Vielleicht verhindert':v<60?'Unentschlossen':v<80?'Hat zugesagt':'Kommt sicher. Gott sei Dank.' },
+  Aron:  { val:50, fill:'fAron',  thumb:'thAron',  track:'tAron',  label:'vAron',  sub:'sAron',
+    subs: v => v<20?'FABE-Level droht':v<40?'Colin-Modus':v<60?'Status Quo GL':v<80?'Auf dem Weg nach oben':'Geschäftsführer — fast sicher.' },
+  Colin: { val:50, fill:'fColin', thumb:'thColin', track:'tColin', label:'vColin', sub:'sColin',
+    subs: v => v<20?'Massiv unter Druck':v<40?'Nervös aber stabil':v<60?'Sicherer Hafen':v<80?'Aufstieg möglich':'Überraschungskandidat für GL.' },
+  Kevin: { val:20, fill:'fKevin', thumb:'thKevin', track:'tKevin', label:'vKevin', sub:'sKevin',
+    subs: v => v<20?'Noch FABE-Betreuung':v<40?'Aufstieg beginnt':v<60?'Kevin ist wer':v<80?'Kevin übernimmt':'Kevin ist jetzt Chef. Wirklich.' },
+};
+
+function updateBaro(name, pct) {
+  const b = baros[name];
+  b.val = Math.round(pct);
+  document.getElementById(b.fill).style.width = pct+'%';
+  document.getElementById(b.thumb).style.left = pct+'%';
+  document.getElementById(b.label).textContent = Math.round(pct)+'%';
+  document.getElementById(b.sub).textContent = b.subs(Math.round(pct));
+}
+
+// Drag logic for each baro
+Object.entries(baros).forEach(([name, b]) => {
+  const track = document.getElementById(b.track);
+  let dragging = false;
+
+  function getVal(e) {
+    const rect = track.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const pct = Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100));
+    return pct;
+  }
+
+  track.addEventListener('mousedown',  e => { dragging=true; updateBaro(name, getVal(e)); });
+  track.addEventListener('touchstart', e => { dragging=true; updateBaro(name, getVal(e)); }, {passive:true});
+  window.addEventListener('mousemove',  e => { if(dragging) updateBaro(name, getVal(e)); });
+  window.addEventListener('touchmove',  e => { if(dragging) updateBaro(name, getVal(e)); }, {passive:true});
+  window.addEventListener('mouseup',   () => dragging=false);
+  window.addEventListener('touchend',  () => dragging=false);
+});
+
+/* ── ORACLE ── */
+const facts = [
+  "familea betreibt über 40 Kitas in der Region Basel.",
+  "Gegründet 1901 — Pionierin für Frauen, Kinder und Familien.",
+  "familea begleitet Kinder von 0 bis 18 Jahren.",
+  "Über 800 Mitarbeitende arbeiten für familea.",
+  "Das Jubiläumsfest findet am Münsterplatz statt — Herz von Basel.",
+  "familea unterstützt auch Pflegefamilien in der ganzen Region.",
+  "familea ist eine der ältesten Sozialorganisationen der Schweiz.",
+  "125 Jahre — und kein bisschen leiser.",
+  "familea hat Kitas bei Novartis, Roche und der Universität Basel.",
+];
+
+let isSpinning = false;
+
+function buildOutcome() {
+  const t = baros.Timmy.val;
+  const a = baros.Aron.val;
+  const c = baros.Colin.val;
+  const k = baros.Kevin.val;
+
+  // Timmy kommt sicher
+  if(t>=85) return { verdict:"Fest-Alarm", text:"Timmy ist da. Mit Lautsprecher. Aron schaut aus dem Fenster in die Ferne. Kevin übernimmt spontan die Kuchenausgabe als FABE." };
+  // Timmy kommt nicht, Aron wird Chef
+  if(t<=15 && a>=80) return { verdict:"Triumph", text:"Kein Timmy. Aron wird Geschäftsführer. Colin nickt professionell. Kevin backt einen Kuchen." };
+  // Kevin übernimmt
+  if(k>=80 && a<=30) return { verdict:"Die Überraschung", text:"Niemand hat Kevin auf dem Radar gehabt. Er kommt aus der FABE-Betreuung, übernimmt das Mikrofon und redet 20 Minuten. Alle applaudieren verwirrt." };
+  // Colin rettet alles
+  if(c>=80 && t>=60) return { verdict:"Colin's Moment", text:"Timmy erscheint — aber Colin fängt ihn am Eingang ab. Zwei Stunden später sind sie befreundet. Aron ist erleichtert und leicht eifersüchtig." };
+  // Alle unsicher
+  if(t>=50 && a<=50 && c<=50) return { verdict:"Totales Chaos", text:"Timmy kommt. Aron zögert. Colin schaut. Kevin fragt ob er helfen kann. Das Fest läuft irgendwie trotzdem weiter." };
+  // Aron rauf, Timmy mittel
+  if(a>=70 && t<60) return { verdict:"Knappe Sache", text:"Timmy erscheint kurz, isst einen Kuchen und geht. Aron hält eine solide Rede. Die Beförderung ist noch kein Thema — aber der Blick vom Vorstand war positiv." };
+  // Kevin + Colin duo
+  if(k>=60 && c>=60) return { verdict:"Das unerwartete Duo", text:"Colin und Kevin arbeiten zusammen. Das Fest läuft wie am Schnürchen. Aron fragt sich wann das passiert ist. Timmy verpasst alles." };
+  // Standard
+  const standards = [
+    { verdict:"Stabile Lage", text:"Kein grosser Vorfall. Drei Reden, ein Fototermin, viele Kuchenteller. Aron bleibt wo er ist." },
+    { verdict:"Latente Spannung", text:"Timmy hat nicht definitiv abgesagt. Die Stimmung ist angespannt. Aron isst nichts." },
+    { verdict:"Feiner Unterschied", text:"Alles läuft — aber nichts verändert sich. Aron überlebt. Kevin auch. Colin sowieso." },
+  ];
+  return standards[Math.floor(Math.random()*standards.length)];
+}
+
+function spin() {
+  if(isSpinning) return;
+  isSpinning = true;
+  const area = document.getElementById('resultArea');
+  const hint = document.getElementById('wheelHint');
+  hint.style.opacity='0';
+  area.classList.add('fading');
+  area.classList.remove('active-result');
+
+  triggerWheel(1000+Math.random()*900, () => {
+    const o = buildOutcome();
+    const fact = facts[Math.floor(Math.random()*facts.length)];
+    document.getElementById('verdict').textContent = o.verdict;
+    document.getElementById('resultText').textContent = o.text;
+    document.getElementById('factChip').textContent = '✦ '+fact;
+    area.classList.remove('fading');
+    area.classList.add('active-result');
+    hint.style.opacity='1';
+    isSpinning=false;
+  });
+}
+</script>
+
+</body>
+</html>
