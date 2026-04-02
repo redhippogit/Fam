@@ -8,244 +8,108 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
 html { height: 100%; height: -webkit-fill-available; }
-body {
-min-height: 100vh;
-min-height: -webkit-fill-available;
-background: #050505;
-font-family: ‘Cormorant Garamond’, serif;
-overflow-x: hidden;
-overflow-y: auto;
-}
-
+body { min-height: 100vh; background: #050505; font-family: 'Cormorant Garamond', serif; overflow-x: hidden; overflow-y: auto; color: #fff; }
 canvas#bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
-/* ── MAIN LAYOUT ── */
-.page {
-position: relative; z-index: 10;
-min-height: 100vh;
-display: flex; flex-direction: column;
-align-items: center;
-padding: env(safe-area-inset-top, 24px) 24px env(safe-area-inset-bottom, 24px);
-padding-bottom: max(env(safe-area-inset-bottom), 24px);
-}
+.page { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; padding: 36px 20px 48px; max-width: 600px; margin: 0 auto; }
 
-/* ── TOP ── */
-.top-section {
-width: 100%; max-width: 600px;
-display: flex; flex-direction: column; align-items: center;
-padding-top: 32px;
-}
-
-.eyebrow {
-font-family: ‘Cinzel’, serif;
-font-size: clamp(0.55rem, 1.5vw, 0.72rem);
-letter-spacing: 0.4em; color: rgba(255,255,255,0.32);
-text-transform: uppercase; margin-bottom: 20px;
-opacity: 0; animation: fadeUp 1.2s ease 0.2s forwards;
-}
-
-.title-main {
-font-family: ‘Cinzel’, serif;
-font-size: clamp(2.4rem, 7vw, 4rem);
-font-weight: 600; color: #fff;
-letter-spacing: 0.14em; line-height: 1;
-text-align: center;
-opacity: 0; animation: fadeUp 1.2s ease 0.4s forwards;
-}
-.title-sub {
-font-size: clamp(1rem, 2.8vw, 1.3rem);
-font-weight: 300; font-style: italic;
-color: rgba(255,255,255,0.55);
-margin-top: 10px; text-align: center;
-opacity: 0; animation: fadeUp 1.2s ease 0.55s forwards;
-}
-
-.divider {
-display: flex; align-items: center; gap: 14px;
-margin: 20px 0;
-opacity: 0; animation: fadeUp 1.2s ease 0.7s forwards;
-}
+/* ── SHARED ── */
+.eyebrow { font-family: ‘Cinzel’, serif; font-size: clamp(0.55rem,1.5vw,0.68rem); letter-spacing: 0.42em; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 16px; opacity:0; animation: fadeUp 1.2s ease 0.1s forwards; }
+.title-main { font-family: ‘Cinzel’, serif; font-size: clamp(2rem,6vw,3.4rem); font-weight: 600; color: #fff; letter-spacing: 0.13em; text-align: center; line-height: 1; opacity:0; animation: fadeUp 1.2s ease 0.25s forwards; }
+.title-sub { font-size: clamp(0.95rem,2.5vw,1.15rem); font-style: italic; font-weight: 300; color: rgba(255,255,255,0.5); margin-top: 10px; text-align: center; opacity:0; animation: fadeUp 1.2s ease 0.4s forwards; }
+.divider { display: flex; align-items: center; gap: 14px; margin: 20px 0; opacity:0; animation: fadeUp 1.2s ease 0.5s forwards; }
 .dl { width: 60px; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,168,74,0.5)); }
 .dr { width: 60px; height: 1px; background: linear-gradient(90deg, rgba(212,168,74,0.5), transparent); }
 .dd { width: 6px; height: 6px; background: #D4A84A; transform: rotate(45deg); box-shadow: 0 0 12px rgba(212,168,74,0.8); }
+.section-label { font-family: ‘Cinzel’, serif; font-size: clamp(0.55rem,1.5vw,0.65rem); letter-spacing: 0.38em; color: rgba(255,255,255,0.22); text-transform: uppercase; text-align: center; margin-bottom: 14px; }
 
-/* ── WHEEL ── */
-.wheel-section {
-display: flex; flex-direction: column; align-items: center;
-margin-bottom: 20px;
-opacity: 0; animation: fadeUp 1.2s ease 0.85s forwards;
-}
-.wheel-wrap {
-cursor: pointer;
-display: flex; flex-direction: column; align-items: center;
-padding: 16px;
-border-radius: 50%;
-transition: transform 0.15s;
-/* big touch target */
-}
+/* ── WHEEL SECTION ── */
+.wheel-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; opacity:0; animation: fadeUp 1.2s ease 0.65s forwards; }
+.wheel-wrap { cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 10px; transition: transform 0.15s; }
 .wheel-wrap:active { transform: scale(0.94); }
+.wheel-hint { margin-top: 10px; font-family: ‘Cinzel’, serif; font-size: clamp(0.5rem,1.4vw,0.62rem); letter-spacing: 0.5em; color: rgba(212,168,74,0.6); text-transform: uppercase; white-space: nowrap; transition: color 0.3s, opacity 0.4s; }
+.wheel-wrap:hover .wheel-hint { color: rgba(212,168,74,1); }
 canvas#wheel { display: block; }
-.wheel-hint {
-margin-top: 10px;
-font-family: ‘Cinzel’, serif;
-font-size: clamp(0.55rem, 1.5vw, 0.65rem);
-letter-spacing: 0.5em; color: rgba(212,168,74,0.6);
-text-transform: uppercase; white-space: nowrap;
-transition: color 0.3s, opacity 0.4s;
-}
 
 /* ── RESULT ── */
-.result-area {
-width: 100%; max-width: 560px;
-display: flex; flex-direction: column; align-items: center; gap: 8px;
-padding: 20px 28px 18px;
-border-top: 1px solid rgba(255,255,255,0.07);
-border-bottom: 1px solid rgba(255,255,255,0.07);
-transition: border-color 0.6s;
-text-align: center; margin-bottom: 24px;
-min-height: 110px; justify-content: center;
-opacity: 0; animation: fadeUp 1.2s ease 1s forwards;
-}
+.result-area { width: 100%; max-width: 560px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 24px 18px; border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07); transition: border-color 0.6s; text-align: center; margin-bottom: 24px; min-height: 110px; justify-content: center; opacity:0; animation: fadeUp 1.2s ease 0.85s forwards; }
 .result-area.active-result { border-color: rgba(212,168,74,0.3); }
-.result-verdict {
-font-family: ‘Cinzel’, serif;
-font-size: clamp(0.7rem, 2vw, 0.85rem);
-letter-spacing: 0.38em; color: #D4A84A;
-text-transform: uppercase; transition: opacity 0.3s;
-}
-.result-text {
-font-size: clamp(1.05rem, 3vw, 1.3rem);
-font-weight: 400; font-style: italic; color: #fff;
-line-height: 1.8; transition: opacity 0.3s, transform 0.3s;
-}
-.fact-chip {
-font-size: clamp(0.72rem, 2vw, 0.85rem);
-color: rgba(255,255,255,0.3); transition: opacity 0.3s;
-}
-.result-area.fading .result-verdict,
-.result-area.fading .result-text,
-.result-area.fading .fact-chip { opacity: 0; transform: translateY(6px); }
+.result-verdict { font-family: ‘Cinzel’, serif; font-size: clamp(0.68rem,2vw,0.82rem); letter-spacing: 0.38em; color: #D4A84A; text-transform: uppercase; transition: opacity 0.3s; }
+.result-text { font-size: clamp(1.05rem,2.8vw,1.28rem); font-weight: 400; font-style: italic; color: #fff; line-height: 1.8; transition: opacity 0.3s, transform 0.3s; }
+.fact-chip { font-size: clamp(0.7rem,1.9vw,0.82rem); color: rgba(255,255,255,0.3); transition: opacity 0.3s; }
+.result-area.fading .result-verdict, .result-area.fading .result-text, .result-area.fading .fact-chip { opacity: 0; transform: translateY(6px); }
 
 /* ── BAROMETER PANEL ── */
-.baro-panel {
-width: 100%; max-width: 600px;
-background: rgba(5,5,5,0.85);
-border: 1px solid rgba(255,255,255,0.06);
-border-radius: 16px;
-padding: 20px 20px 16px;
-margin-bottom: 16px;
-opacity: 0; animation: fadeUp 1.2s ease 1.15s forwards;
-backdrop-filter: blur(10px);
-}
+.baro-panel { width: 100%; background: rgba(5,5,5,0.85); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px 18px 18px; margin-bottom: 24px; opacity:0; animation: fadeUp 1.2s ease 1s forwards; backdrop-filter: blur(10px); }
+.baro-grid { display: flex; flex-direction: column; gap: 14px; }
+.baro-item { display: flex; flex-direction: column; gap: 5px; }
+.baro-header { display: flex; justify-content: space-between; align-items: baseline; }
+.baro-name { font-family: ‘Cinzel’, serif; font-size: clamp(0.65rem,1.8vw,0.78rem); letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; }
+.baro-val { font-family: ‘Cinzel’, serif; font-size: clamp(0.62rem,1.7vw,0.75rem); }
+.baro-sub { font-size: clamp(0.68rem,1.9vw,0.8rem); font-style: italic; color: rgba(255,255,255,0.3); font-family: ‘Cormorant Garamond’, serif; }
+.baro-track { height: 22px; position: relative; cursor: pointer; touch-action: none; display: flex; align-items: center; }
+.baro-track-inner { width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); position: relative; }
+.baro-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 2px; }
+.baro-thumb { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); cursor: grab; box-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+.baro-timmy .baro-name { color: #FF6B6B; } .baro-timmy .baro-val { color: #FF6B6B; } .baro-timmy .baro-fill { background: linear-gradient(90deg,#6B0000,#FF6B6B); } .baro-timmy .baro-thumb { background: #FF6B6B; box-shadow: 0 0 10px rgba(255,107,107,0.6); }
+.baro-aron .baro-name { color: #D4A84A; } .baro-aron .baro-val { color: #D4A84A; } .baro-aron .baro-fill { background: linear-gradient(90deg,#4A3A10,#D4A84A); } .baro-aron .baro-thumb { background: #D4A84A; box-shadow: 0 0 10px rgba(212,168,74,0.6); }
+.baro-colin .baro-name { color: #6AB4D0; } .baro-colin .baro-val { color: #6AB4D0; } .baro-colin .baro-fill { background: linear-gradient(90deg,#0A2A3A,#6AB4D0); } .baro-colin .baro-thumb { background: #6AB4D0; box-shadow: 0 0 10px rgba(106,180,208,0.6); }
+.baro-kevin .baro-name { color: #9B6EA8; } .baro-kevin .baro-val { color: #9B6EA8; } .baro-kevin .baro-fill { background: linear-gradient(90deg,#1A0A2A,#9B6EA8); } .baro-kevin .baro-thumb { background: #9B6EA8; box-shadow: 0 0 10px rgba(155,110,168,0.6); }
 
-.baro-title {
-font-family: ‘Cinzel’, serif;
-font-size: clamp(0.5rem, 1.4vw, 0.6rem);
-letter-spacing: 0.38em; color: rgba(255,255,255,0.22);
-text-transform: uppercase; text-align: center; margin-bottom: 16px;
-}
+/* ── SECTION SEPARATOR ── */
+.big-divider { width: 100%; display: flex; align-items: center; gap: 16px; margin: 28px 0 24px; opacity:0; animation: fadeUp 1.2s ease 1.1s forwards; }
+.big-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+.big-divider-text { font-family: ‘Cinzel’, serif; font-size: clamp(0.52rem,1.4vw,0.62rem); letter-spacing: 0.35em; color: rgba(255,255,255,0.2); text-transform: uppercase; white-space: nowrap; }
 
-.baro-grid {
-display: grid; grid-template-columns: 1fr;
-gap: 14px;
-}
+/* ── GL BUILDER ── */
+.gl-grid { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; opacity:0; animation: fadeUp 1.2s ease 1.2s forwards; }
+.gl-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 13px; cursor: pointer; transition: all 0.3s; }
+.gl-card:active { transform: scale(0.98); }
+.gl-card.selected { border-color: rgba(212,168,74,0.4); background: rgba(212,168,74,0.06); }
+.gl-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.1); transition: border-color 0.3s; }
+.gl-card.selected .gl-avatar { border-color: rgba(212,168,74,0.5); }
+.gl-info { flex: 1; min-width: 0; }
+.gl-name { font-family: ‘Cinzel’, serif; font-size: clamp(0.72rem,2vw,0.86rem); font-weight: 600; color: #fff; letter-spacing: 0.1em; }
+.gl-title-small { font-size: clamp(0.7rem,1.9vw,0.82rem); font-style: italic; color: rgba(255,255,255,0.38); margin-top: 2px; }
+.gl-tag { font-size: clamp(0.62rem,1.7vw,0.74rem); color: rgba(255,255,255,0.2); margin-top: 3px; font-style: italic; }
+.role-selector { display: none; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.gl-card.selected .role-selector { display: flex; }
+.role-btn { font-family: ‘Cinzel’, serif; font-size: 0.48rem; letter-spacing: 0.12em; padding: 5px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.25s; background: transparent; text-transform: uppercase; white-space: nowrap; }
+.role-btn.active { border-color: #D4A84A; color: #D4A84A; background: rgba(212,168,74,0.08); }
+.gl-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.gl-role-badge { font-family: ‘Cinzel’, serif; font-size: 0.48rem; letter-spacing: 0.15em; padding: 3px 8px; border: 1px solid #D4A84A; color: #D4A84A; border-radius: 20px; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; white-space: nowrap; }
+.gl-card.selected .gl-role-badge { opacity: 1; }
+.gl-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; font-size: 0.7rem; }
+.gl-card.selected .gl-check { background: #D4A84A; border-color: #D4A84A; color: #000; }
 
-.baro-item { display: flex; flex-direction: column; gap: 6px; }
+/* ── GENERATE ── */
+.generate-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; opacity:0; animation: fadeUp 1.2s ease 1.3s forwards; }
+.generate-btn { font-family: ‘Cinzel’, serif; font-size: clamp(0.62rem,1.8vw,0.75rem); letter-spacing: 0.35em; text-transform: uppercase; color: #000; background: #D4A84A; border: none; border-radius: 30px; padding: 15px 36px; cursor: pointer; transition: all 0.3s; width: 100%; max-width: 320px; box-shadow: 0 0 20px rgba(212,168,74,0.25); }
+.generate-btn:hover { background: #E8C870; }
+.generate-btn:active { transform: scale(0.97); }
+.generate-btn:disabled { opacity: 0.3; cursor: default; transform: none !important; }
+.selected-count { font-family: ‘Cinzel’, serif; font-size: clamp(0.52rem,1.4vw,0.62rem); letter-spacing: 0.3em; color: rgba(255,255,255,0.22); text-transform: uppercase; }
 
-.baro-header {
-display: flex; justify-content: space-between; align-items: baseline;
-}
-.baro-name {
-font-family: ‘Cinzel’, serif;
-font-size: clamp(0.62rem, 1.8vw, 0.75rem);
-letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
-}
-.baro-val {
-font-family: ‘Cinzel’, serif;
-font-size: clamp(0.6rem, 1.6vw, 0.72rem);
-letter-spacing: 0.05em;
-}
-.baro-sub {
-font-size: clamp(0.65rem, 1.8vw, 0.78rem);
-font-style: italic; color: rgba(255,255,255,0.3);
-font-family: ‘Cormorant Garamond’, serif;
-white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
+/* ── GL RESULT ── */
+.gl-result { width: 100%; background: rgba(0,0,0,0.65); border: 1px solid rgba(212,168,74,0.25); border-radius: 16px; padding: 24px 20px; display: none; flex-direction: column; gap: 16px; margin-bottom: 24px; backdrop-filter: blur(8px); }
+.gl-result.visible { display: flex; animation: fadeUp 0.8s ease forwards; }
+.gl-result-title { font-family: ‘Cinzel’, serif; font-size: clamp(0.65rem,1.8vw,0.8rem); letter-spacing: 0.38em; color: #D4A84A; text-transform: uppercase; text-align: center; }
+.gl-members { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.gl-member-chip { font-family: ‘Cinzel’, serif; font-size: clamp(0.58rem,1.6vw,0.7rem); letter-spacing: 0.1em; padding: 5px 12px; border: 1px solid rgba(212,168,74,0.3); border-radius: 20px; color: rgba(255,255,255,0.65); background: rgba(212,168,74,0.05); }
+.gl-member-chip span { color: #D4A84A; }
+.hr { height: 1px; background: rgba(255,255,255,0.07); }
+.gl-statement { font-size: clamp(1rem,2.8vw,1.22rem); font-style: italic; color: #fff; line-height: 1.85; text-align: center; }
+.impact-row { display: flex; align-items: center; gap: 10px; }
+.impact-label { font-family: ‘Cinzel’, serif; font-size: clamp(0.5rem,1.4vw,0.58rem); letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.28); flex: 0 0 110px; }
+.impact-track { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; position: relative; }
+.impact-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+.impact-val { font-family: ‘Cinzel’, serif; font-size: clamp(0.5rem,1.4vw,0.58rem); color: rgba(255,255,255,0.3); flex: 0 0 30px; text-align: right; }
 
-/* Track — tall touch target */
-.baro-track {
-height: 20px; /* big touch area */
-position: relative; cursor: pointer;
-touch-action: none;
-display: flex; align-items: center;
-}
-.baro-track-inner {
-width: 100%; height: 4px; border-radius: 2px;
-background: rgba(255,255,255,0.1);
-position: relative;
-}
-.baro-fill {
-position: absolute; left: 0; top: 0; height: 100%;
-border-radius: 2px;
-}
-.baro-thumb {
-position: absolute; top: 50%; transform: translate(-50%,-50%);
-width: 18px; height: 18px; border-radius: 50%;
-border: 2px solid rgba(255,255,255,0.4);
-cursor: grab;
-box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
+/* ── SIGNATURE ── */
+.signature { font-family: ‘Cinzel’, serif; font-size: clamp(0.58rem,1.6vw,0.7rem); letter-spacing: 0.28em; color: rgba(212,168,74,0.6); text-transform: uppercase; text-align: center; margin-top: 8px; padding-bottom: 8px; opacity:0; animation: fadeUp 1.2s ease 1.5s forwards; }
 
-/* Colours */
-.baro-timmy .baro-name { color: #FF6B6B; }
-.baro-timmy .baro-val  { color: #FF6B6B; }
-.baro-timmy .baro-fill { background: linear-gradient(90deg,#6B0000,#FF6B6B); }
-.baro-timmy .baro-thumb { background: #FF6B6B; box-shadow: 0 0 10px rgba(255,107,107,0.7); }
-
-.baro-aron  .baro-name { color: #D4A84A; }
-.baro-aron  .baro-val  { color: #D4A84A; }
-.baro-aron  .baro-fill { background: linear-gradient(90deg,#4A3A10,#D4A84A); }
-.baro-aron  .baro-thumb { background: #D4A84A; box-shadow: 0 0 10px rgba(212,168,74,0.7); }
-
-.baro-colin .baro-name { color: #6AB4D0; }
-.baro-colin .baro-val  { color: #6AB4D0; }
-.baro-colin .baro-fill { background: linear-gradient(90deg,#0A2A3A,#6AB4D0); }
-.baro-colin .baro-thumb { background: #6AB4D0; box-shadow: 0 0 10px rgba(106,180,208,0.7); }
-
-.baro-kevin .baro-name { color: #9B6EA8; }
-.baro-kevin .baro-val  { color: #9B6EA8; }
-.baro-kevin .baro-fill { background: linear-gradient(90deg,#1A0A2A,#9B6EA8); }
-.baro-kevin .baro-thumb { background: #9B6EA8; box-shadow: 0 0 10px rgba(155,110,168,0.7); }
-
-.footer-note {
-font-size: clamp(0.58rem, 1.5vw, 0.7rem);
-letter-spacing: 0.06em; color: rgba(255,255,255,0.28);
-font-style: italic; text-align: center;
-margin-bottom: 8px;
-opacity: 0; animation: fadeUp 1.2s ease 1.4s forwards;
-}
-
-@keyframes fadeUp {
-from { opacity: 0; transform: translateY(14px); }
-to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── RESPONSIVE: large iPad landscape ── */
-@media (min-width: 900px) {
-.page { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; padding-top: 40px; gap: 0 40px; }
-.top-section { flex: 0 0 340px; }
-.wheel-section { flex: 0 0 340px; margin-top: 40px; }
-.result-area { flex: 0 0 100%; max-width: 700px; }
-.baro-panel { flex: 0 0 100%; max-width: 700px; }
-.counter-row, .footer-note { flex: 0 0 100%; }
-}
-
-/* ── RESPONSIVE: small phone ── */
-@media (max-width: 380px) {
-
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 </head>
@@ -253,14 +117,13 @@ to   { opacity: 1; transform: translateY(0); }
 <canvas id="bg"></canvas>
 
 <div class="page">
-  <div class="top-section">
-    <div class="eyebrow">familea · Pionierin seit 1901 · Basel</div>
-    <div class="title-main">Das Schicksal</div>
-    <div class="title-sub">Kommt Timmy — und was bleibt von Aron?</div>
-    <div class="divider">
-      <div class="dl"></div><div class="dd"></div><div class="dr"></div>
-    </div>
-  </div>
+
+  <!-- ══ PART 1: SCHICKSALS-RAD ══ -->
+
+  <div class="eyebrow">familea · Pionierin seit 1901 · Basel</div>
+  <div class="title-main">Das Schicksal</div>
+  <div class="title-sub">Kommt Timmy — und was bleibt von Aron?</div>
+  <div class="divider"><div class="dl"></div><div class="dd"></div><div class="dr"></div></div>
 
   <div class="wheel-section">
     <div class="wheel-wrap" id="wheelWrap" onclick="spin()">
@@ -275,90 +138,74 @@ to   { opacity: 1; transform: translateY(0); }
     <div class="fact-chip" id="factChip">familea betreibt über 40 Kitas in der Region Basel.</div>
   </div>
 
-  <!-- BAROMETER -->
-
   <div class="baro-panel">
-    <div class="baro-title">Personen-Barometer — ziehen zum Einstellen</div>
+    <div class="section-label">Personen-Barometer — ziehen zum Einstellen</div>
     <div class="baro-grid">
-
-```
-  <div class="baro-item baro-timmy">
-    <div class="baro-header">
-      <span class="baro-name">Timmy</span>
-      <span class="baro-val" id="vTimmy">50%</span>
-    </div>
-    <div class="baro-sub" id="sTimmy">Unentschlossen</div>
-    <div class="baro-track" id="tTimmy">
-      <div class="baro-track-inner">
-        <div class="baro-fill" id="fTimmy" style="width:50%"></div>
-        <div class="baro-thumb" id="thTimmy" style="left:50%"></div>
+      <div class="baro-item baro-timmy">
+        <div class="baro-header"><span class="baro-name">Timmy</span><span class="baro-val" id="vTimmy">50%</span></div>
+        <div class="baro-sub" id="sTimmy">Unentschlossen</div>
+        <div class="baro-track" id="tTimmy"><div class="baro-track-inner"><div class="baro-fill" id="fTimmy" style="width:50%"></div><div class="baro-thumb" id="thTimmy" style="left:50%"></div></div></div>
+      </div>
+      <div class="baro-item baro-aron">
+        <div class="baro-header"><span class="baro-name">Aron</span><span class="baro-val" id="vAron">50%</span></div>
+        <div class="baro-sub" id="sAron">Status Quo GL</div>
+        <div class="baro-track" id="tAron"><div class="baro-track-inner"><div class="baro-fill" id="fAron" style="width:50%"></div><div class="baro-thumb" id="thAron" style="left:50%"></div></div></div>
+      </div>
+      <div class="baro-item baro-colin">
+        <div class="baro-header"><span class="baro-name">Colin</span><span class="baro-val" id="vColin">50%</span></div>
+        <div class="baro-sub" id="sColin">Sicherer Hafen</div>
+        <div class="baro-track" id="tColin"><div class="baro-track-inner"><div class="baro-fill" id="fColin" style="width:50%"></div><div class="baro-thumb" id="thColin" style="left:50%"></div></div></div>
+      </div>
+      <div class="baro-item baro-kevin">
+        <div class="baro-header"><span class="baro-name">Kevin</span><span class="baro-val" id="vKevin">20%</span></div>
+        <div class="baro-sub" id="sKevin">Noch FABE-Betreuung</div>
+        <div class="baro-track" id="tKevin"><div class="baro-track-inner"><div class="baro-fill" id="fKevin" style="width:20%"></div><div class="baro-thumb" id="thKevin" style="left:20%"></div></div></div>
       </div>
     </div>
   </div>
 
-  <div class="baro-item baro-aron">
-    <div class="baro-header">
-      <span class="baro-name">Aron</span>
-      <span class="baro-val" id="vAron">50%</span>
-    </div>
-    <div class="baro-sub" id="sAron">Status Quo GL</div>
-    <div class="baro-track" id="tAron">
-      <div class="baro-track-inner">
-        <div class="baro-fill" id="fAron" style="width:50%"></div>
-        <div class="baro-thumb" id="thAron" style="left:50%"></div>
-      </div>
-    </div>
+  <!-- ══ SECTION BREAK ══ -->
+
+  <div class="big-divider">
+    <div class="big-divider-line"></div>
+    <div class="big-divider-text">Die neue GL</div>
+    <div class="big-divider-line"></div>
   </div>
 
-  <div class="baro-item baro-colin">
-    <div class="baro-header">
-      <span class="baro-name">Colin</span>
-      <span class="baro-val" id="vColin">50%</span>
-    </div>
-    <div class="baro-sub" id="sColin">Sicherer Hafen</div>
-    <div class="baro-track" id="tColin">
-      <div class="baro-track-inner">
-        <div class="baro-fill" id="fColin" style="width:50%"></div>
-        <div class="baro-thumb" id="thColin" style="left:50%"></div>
-      </div>
-    </div>
+  <!-- ══ PART 2: GL KONFIGURATOR ══ -->
+
+  <div class="section-label">Stell die neue Geschäftsleitung zusammen</div>
+  <div class="gl-grid" id="glGrid"></div>
+
+  <div class="generate-wrap">
+    <div class="selected-count" id="selectedCount">Niemanden ausgewählt</div>
+    <button class="generate-btn" id="generateBtn" onclick="generateGL()" disabled>GL analysieren</button>
   </div>
 
-  <div class="baro-item baro-kevin">
-    <div class="baro-header">
-      <span class="baro-name">Kevin</span>
-      <span class="baro-val" id="vKevin">20%</span>
-    </div>
-    <div class="baro-sub" id="sKevin">Noch FABE-Betreuung</div>
-    <div class="baro-track" id="tKevin">
-      <div class="baro-track-inner">
-        <div class="baro-fill" id="fKevin" style="width:20%"></div>
-        <div class="baro-thumb" id="thKevin" style="left:20%"></div>
-      </div>
-    </div>
+  <div class="gl-result" id="glResult">
+    <div class="gl-result-title" id="glResultTitle">Neue Geschäftsleitung</div>
+    <div class="gl-members" id="glMembers"></div>
+    <div class="hr"></div>
+    <div class="gl-statement" id="glStatement"></div>
+    <div class="hr"></div>
+    <div id="glImpacts"></div>
   </div>
 
-</div>
-```
-
-  </div>
-
-  <div style="font-family:'Cinzel',serif;font-size:clamp(0.72rem,2vw,0.9rem);letter-spacing:0.32em;color:rgba(212,168,74,0.85);text-shadow:0 0 12px rgba(212,168,74,0.3);text-transform:uppercase;text-align:center;margin-top:10px;padding-bottom:12px;">another stupid redhippo© project. nobody asked for. built with insomnia</div>
+  <div class="signature">another stupid redhippo© project. nobody asked for. built with insomnia</div>
 </div>
 
 <script>
 /* ── BACKGROUND ── */
 (function(){
-  const c=document.getElementById('bg'), ctx=c.getContext('2d');
+  const c=document.getElementById('bg'),ctx=c.getContext('2d');
   let W,H,t=0;
   function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
   resize(); window.addEventListener('resize',resize);
   const blobs=[
-    {cx:0.12,cy:0.18,r:0.32,color:[45,191,184], speed:0.28,phase:0},
-    {cx:0.88,cy:0.14,r:0.28,color:[244,135,75],  speed:0.22,phase:1.5},
-    {cx:0.80,cy:0.78,r:0.30,color:[155,110,168], speed:0.18,phase:3.0},
-    {cx:0.14,cy:0.84,r:0.25,color:[232,125,168], speed:0.25,phase:4.5},
-    {cx:0.50,cy:0.50,r:0.18,color:[106,180,208], speed:0.32,phase:2.0},
+    {cx:0.12,cy:0.18,r:0.32,color:[45,191,184],speed:0.28,phase:0},
+    {cx:0.88,cy:0.14,r:0.28,color:[244,135,75],speed:0.22,phase:1.5},
+    {cx:0.80,cy:0.78,r:0.30,color:[155,110,168],speed:0.18,phase:3.0},
+    {cx:0.14,cy:0.84,r:0.25,color:[232,125,168],speed:0.25,phase:4.5},
   ];
   function draw(){
     ctx.fillStyle='#050505'; ctx.fillRect(0,0,W,H);
@@ -367,10 +214,9 @@ to   { opacity: 1; transform: translateY(0); }
       const x=W*(b.cx+0.03*Math.sin(t*b.speed*0.7+b.phase));
       const y=H*(b.cy+0.03*Math.cos(t*b.speed*0.5+b.phase));
       const r=Math.min(W,H)*(b.r+p*0.04);
-      const a=0.22+p*0.12;
+      const a=0.2+p*0.1;
       const g=ctx.createRadialGradient(x,y,0,x,y,r);
       g.addColorStop(0,`rgba(${b.color[0]},${b.color[1]},${b.color[2]},${a})`);
-      g.addColorStop(0.5,`rgba(${b.color[0]},${b.color[1]},${b.color[2]},${a*0.4})`);
       g.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
     });
@@ -381,159 +227,108 @@ to   { opacity: 1; transform: translateY(0); }
 
 /* ── WHEEL ── */
 (function(){
-  const c=document.getElementById('wheel'), ctx=c.getContext('2d');
+  const c=document.getElementById('wheel'),ctx=c.getContext('2d');
   const S=160,cx=80,cy=80,R=58,TEETH=18;
   let angle=0,speed=0,spinning=false,stopAt=null,onDone=null,hovered=false;
   const wrap=document.getElementById('wheelWrap');
   wrap.addEventListener('mouseenter',()=>hovered=true);
   wrap.addEventListener('mouseleave',()=>hovered=false);
-
   function draw(){
     ctx.clearRect(0,0,S,S);
-    if(hovered&&!spinning){
-      const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,R+14);
-      glow.addColorStop(0,'rgba(212,168,74,0.1)'); glow.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=glow; ctx.fillRect(0,0,S,S);
-    }
-    ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+    if(hovered&&!spinning){const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,R+14);glow.addColorStop(0,'rgba(212,168,74,0.1)');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,S,S);}
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);
     const al=spinning?0.95:0.72;
-    ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(212,168,74,${spinning?0.6:0.3})`; ctx.lineWidth=1; ctx.stroke();
-    for(let i=0;i<TEETH;i++){
-      const a=(i/TEETH)*Math.PI*2,tH=8,tW=0.10;
-      ctx.save(); ctx.rotate(a);
-      ctx.beginPath(); ctx.moveTo(R-tH,-tW*R); ctx.lineTo(R,-tW*R*0.55);
-      ctx.lineTo(R,tW*R*0.55); ctx.lineTo(R-tH,tW*R);
-      ctx.closePath(); ctx.fillStyle=`rgba(212,168,74,${al})`; ctx.fill(); ctx.restore();
-    }
-    for(let i=0;i<6;i++){
-      const a=(i/6)*Math.PI*2;
-      ctx.beginPath(); ctx.moveTo(10*Math.cos(a),10*Math.sin(a));
-      ctx.lineTo((R-10)*Math.cos(a),(R-10)*Math.sin(a));
-      ctx.strokeStyle=`rgba(212,168,74,${spinning?0.35:0.16})`; ctx.lineWidth=0.8; ctx.stroke();
-    }
-    ctx.beginPath(); ctx.arc(0,0,R*0.48,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(212,168,74,${spinning?0.5:0.22})`; ctx.lineWidth=0.8; ctx.stroke();
-    ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2);
-    ctx.fillStyle=`rgba(212,168,74,${al})`; ctx.fill();
+    ctx.beginPath();ctx.arc(0,0,R,0,Math.PI*2);ctx.strokeStyle=`rgba(212,168,74,${spinning?0.6:0.3})`;ctx.lineWidth=1;ctx.stroke();
+    for(let i=0;i<TEETH;i++){const a=(i/TEETH)*Math.PI*2;ctx.save();ctx.rotate(a);ctx.beginPath();ctx.moveTo(R-8,-0.10*R);ctx.lineTo(R,-0.10*R*0.55);ctx.lineTo(R,0.10*R*0.55);ctx.lineTo(R-8,0.10*R);ctx.closePath();ctx.fillStyle=`rgba(212,168,74,${al})`;ctx.fill();ctx.restore();}
+    for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2;ctx.beginPath();ctx.moveTo(10*Math.cos(a),10*Math.sin(a));ctx.lineTo((R-10)*Math.cos(a),(R-10)*Math.sin(a));ctx.strokeStyle=`rgba(212,168,74,${spinning?0.35:0.16})`;ctx.lineWidth=0.8;ctx.stroke();}
+    ctx.beginPath();ctx.arc(0,0,R*0.48,0,Math.PI*2);ctx.strokeStyle=`rgba(212,168,74,${spinning?0.5:0.22})`;ctx.lineWidth=0.8;ctx.stroke();
+    ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fillStyle=`rgba(212,168,74,${al})`;ctx.fill();
     ctx.restore();
-    ctx.save(); ctx.translate(cx,cy);
-    ctx.beginPath(); ctx.moveTo(0,-(R+12)); ctx.lineTo(0,-(R-2));
-    ctx.strokeStyle=`rgba(212,168,74,${spinning?0.9:0.4})`; ctx.lineWidth=1.5; ctx.stroke();
-    ctx.restore();
+    ctx.save();ctx.translate(cx,cy);ctx.beginPath();ctx.moveTo(0,-(R+12));ctx.lineTo(0,-(R-2));ctx.strokeStyle=`rgba(212,168,74,${spinning?0.9:0.4})`;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
   }
-
   let last=null;
-  function loop(ts){
-    if(!last) last=ts;
-    const dt=Math.min((ts-last)/1000,0.05); last=ts;
-    if(spinning){
-      if(stopAt!==null&&ts>=stopAt){
-        speed*=Math.pow(0.93,dt*60);
-        if(speed<0.003){speed=0;spinning=false;if(onDone){onDone();onDone=null;}}
-      }
-      angle+=speed*dt;
-    }
-    draw(); requestAnimationFrame(loop);
-  }
+  function loop(ts){if(!last)last=ts;const dt=Math.min((ts-last)/1000,0.05);last=ts;if(spinning){if(stopAt!==null&&ts>=stopAt){speed*=Math.pow(0.93,dt*60);if(speed<0.003){speed=0;spinning=false;if(onDone){onDone();onDone=null;}}}angle+=speed*dt;}draw();requestAnimationFrame(loop);}
   requestAnimationFrame(loop);
   window.triggerWheel=function(dur,cb){speed=15+Math.random()*5;spinning=true;stopAt=performance.now()+dur;onDone=cb;};
 })();
 
 /* ── BAROMETERS ── */
 const baros={
-  Timmy:{val:50,fill:'fTimmy',thumb:'thTimmy',track:'tTimmy',label:'vTimmy',sub:'sTimmy',
-    subs:v=>v<20?'Wahrscheinlich krank':v<40?'Vielleicht verhindert':v<60?'Unentschlossen':v<80?'Hat zugesagt':'Kommt sicher. Gott steh uns bei.'},
-  Aron: {val:50,fill:'fAron', thumb:'thAron', track:'tAron', label:'vAron', sub:'sAron',
-    subs:v=>v<20?'FABE-Level droht':v<40?'Colin-Modus':v<60?'Status Quo GL':v<80?'Auf dem Weg nach oben':'Geschäftsführer — fast sicher.'},
-  Colin:{val:50,fill:'fColin',thumb:'thColin',track:'tColin',label:'vColin',sub:'sColin',
-    subs:v=>v<20?'Massiv unter Druck':v<40?'Nervös aber stabil':v<60?'Sicherer Hafen':v<80?'Aufstieg möglich':'Überraschungskandidat für GL.'},
-  Kevin:{val:20,fill:'fKevin',thumb:'thKevin',track:'tKevin',label:'vKevin',sub:'sKevin',
-    subs:v=>v<20?'Noch FABE-Betreuung':v<40?'Aufstieg beginnt':v<60?'Kevin ist wer':v<80?'Kevin übernimmt':'Kevin ist jetzt Chef. Wirklich.'},
+  Timmy:{val:50,fill:'fTimmy',thumb:'thTimmy',track:'tTimmy',label:'vTimmy',sub:'sTimmy',subs:v=>v<20?'Wahrscheinlich krank':v<40?'Vielleicht verhindert':v<60?'Unentschlossen':v<80?'Hat zugesagt':'Kommt sicher. Gott steh uns bei.'},
+  Aron: {val:50,fill:'fAron', thumb:'thAron', track:'tAron', label:'vAron', sub:'sAron', subs:v=>v<20?'FABE-Level droht':v<40?'Colin-Modus':v<60?'Status Quo GL':v<80?'Auf dem Weg nach oben':'Geschäftsführer — fast sicher.'},
+  Colin:{val:50,fill:'fColin',thumb:'thColin',track:'tColin',label:'vColin',sub:'sColin',subs:v=>v<20?'Massiv unter Druck':v<40?'Nervös aber stabil':v<60?'Sicherer Hafen':v<80?'Aufstieg möglich':'Überraschungskandidat für GL.'},
+  Kevin:{val:20,fill:'fKevin',thumb:'thKevin',track:'tKevin',label:'vKevin',sub:'sKevin',subs:v=>v<20?'Noch FABE-Betreuung':v<40?'Aufstieg beginnt':v<60?'Kevin ist wer':v<80?'Kevin übernimmt':'Kevin ist jetzt Chef. Wirklich.'},
 };
-
-function updateBaro(name,pct){
-  const b=baros[name];
-  b.val=Math.round(pct);
-  const inner=document.getElementById(b.track).querySelector('.baro-track-inner');
-  const rect=inner.getBoundingClientRect(); // unused here but needed for reference
-  document.getElementById(b.fill).style.width=pct+'%';
-  document.getElementById(b.thumb).style.left=pct+'%';
-  document.getElementById(b.label).textContent=Math.round(pct)+'%';
-  document.getElementById(b.sub).textContent=b.subs(Math.round(pct));
-}
-
-Object.entries(baros).forEach(([name,b])=>{
-  const track=document.getElementById(b.track);
-  let dragging=false;
-
-  function getVal(e){
-    const inner=track.querySelector('.baro-track-inner');
-    const rect=inner.getBoundingClientRect();
-    const clientX=e.touches?e.touches[0].clientX:e.clientX;
-    return Math.min(100,Math.max(0,((clientX-rect.left)/rect.width)*100));
-  }
-
-  track.addEventListener('mousedown', e=>{dragging=true;updateBaro(name,getVal(e));e.preventDefault();});
-  track.addEventListener('touchstart',e=>{dragging=true;updateBaro(name,getVal(e));},{passive:true});
-  window.addEventListener('mousemove', e=>{if(dragging)updateBaro(name,getVal(e));});
-  window.addEventListener('touchmove', e=>{if(dragging)updateBaro(name,getVal(e));},{passive:true});
-  window.addEventListener('mouseup',  ()=>dragging=false);
-  window.addEventListener('touchend', ()=>dragging=false);
-});
+function updateBaro(name,pct){const b=baros[name];b.val=Math.round(pct);const inner=document.getElementById(b.track).querySelector('.baro-track-inner');document.getElementById(b.fill).style.width=pct+'%';document.getElementById(b.thumb).style.left=pct+'%';document.getElementById(b.label).textContent=Math.round(pct)+'%';document.getElementById(b.sub).textContent=b.subs(Math.round(pct));}
+Object.entries(baros).forEach(([name,b])=>{const track=document.getElementById(b.track);let dragging=false;function getVal(e){const inner=track.querySelector('.baro-track-inner');const rect=inner.getBoundingClientRect();const clientX=e.touches?e.touches[0].clientX:e.clientX;return Math.min(100,Math.max(0,((clientX-rect.left)/rect.width)*100));}track.addEventListener('mousedown',e=>{dragging=true;updateBaro(name,getVal(e));e.preventDefault();});track.addEventListener('touchstart',e=>{dragging=true;updateBaro(name,getVal(e));},{passive:true});window.addEventListener('mousemove',e=>{if(dragging)updateBaro(name,getVal(e));});window.addEventListener('touchmove',e=>{if(dragging)updateBaro(name,getVal(e));},{passive:true});window.addEventListener('mouseup',()=>dragging=false);window.addEventListener('touchend',()=>dragging=false);});
 
 /* ── ORACLE ── */
-const facts=[
-  "familea betreibt über 40 Kitas in der Region Basel.",
-  "Gegründet 1901 — Pionierin für Frauen, Kinder und Familien.",
-  "familea begleitet Kinder von 0 bis 18 Jahren.",
-  "Über 800 Mitarbeitende arbeiten für familea.",
-  "Das Jubiläumsfest findet am Münsterplatz statt — Herz von Basel.",
-  "familea unterstützt auch Pflegefamilien in der ganzen Region.",
-  "familea ist eine der ältesten Sozialorganisationen der Schweiz.",
-  "125 Jahre — und kein bisschen leiser.",
-  "familea hat Kitas bei Novartis, Roche und der Universität Basel.",
-];
-
+const facts=["familea betreibt über 40 Kitas in der Region Basel.","Gegründet 1901 — Pionierin für Frauen, Kinder und Familien.","familea begleitet Kinder von 0 bis 18 Jahren.","Über 800 Mitarbeitende arbeiten für familea.","Das Jubiläumsfest findet am Münsterplatz statt — Herz von Basel.","familea unterstützt auch Pflegefamilien in der ganzen Region.","familea ist eine der ältesten Sozialorganisationen der Schweiz.","125 Jahre — und kein bisschen leiser.","familea hat Kitas bei Novartis, Roche und der Universität Basel."];
 let isSpinning=false;
+function buildOutcome(){const t=baros.Timmy.val,a=baros.Aron.val,c=baros.Colin.val,k=baros.Kevin.val;if(t>=85)return{verdict:"Fest-Alarm",text:"Timmy ist da. Mit Lautsprecher. Aron schaut aus dem Fenster. Kevin übernimmt die Kuchenausgabe als FABE."};if(t<=15&&a>=80)return{verdict:"Triumph",text:"Kein Timmy. Aron wird Geschäftsführer. Colin nickt professionell. Kevin backt einen Kuchen."};if(k>=80&&a<=30)return{verdict:"Die Überraschung",text:"Kevin kommt aus der FABE-Betreuung, übernimmt das Mikrofon und redet 20 Minuten. Alle applaudieren verwirrt."};if(c>=80&&t>=60)return{verdict:"Colin's Moment",text:"Timmy erscheint — Colin fängt ihn am Eingang ab. Zwei Stunden später sind sie befreundet. Aron ist erleichtert und leicht eifersüchtig."};if(t>=50&&a<=50&&c<=50)return{verdict:"Totales Chaos",text:"Timmy kommt. Aron zögert. Colin schaut. Kevin fragt ob er helfen kann. Läuft trotzdem."};if(a>=70&&t<60)return{verdict:"Knappe Sache",text:"Timmy isst einen Kuchen und geht. Aron hält eine solide Rede. Der Blick vom Vorstand war positiv."};if(k>=60&&c>=60)return{verdict:"Das unerwartete Duo",text:"Colin und Kevin arbeiten zusammen. Das Fest läuft wie am Schnürchen. Aron fragt sich wann das passiert ist."};const s=[{verdict:"Stabile Lage",text:"Kein grosser Vorfall. Drei Reden, ein Fototermin, viele Kuchenteller. Aron bleibt wo er ist."},{verdict:"Latente Spannung",text:"Timmy hat nicht definitiv abgesagt. Die Stimmung ist angespannt. Aron isst nichts."},{verdict:"Feiner Unterschied",text:"Alles läuft — aber nichts verändert sich. Aron überlebt. Kevin auch. Colin sowieso."}];return s[Math.floor(Math.random()*s.length)];}
+function spin(){if(isSpinning)return;isSpinning=true;const area=document.getElementById('resultArea'),hint=document.getElementById('wheelHint');hint.style.opacity='0';area.classList.add('fading');area.classList.remove('active-result');triggerWheel(1000+Math.random()*900,()=>{const o=buildOutcome(),fact=facts[Math.floor(Math.random()*facts.length)];document.getElementById('verdict').textContent=o.verdict;document.getElementById('resultText').textContent=o.text;document.getElementById('factChip').textContent='✦ '+fact;area.classList.remove('fading');area.classList.add('active-result');hint.style.opacity='1';isSpinning=false;});}
 
-function buildOutcome(){
-  const t=baros.Timmy.val,a=baros.Aron.val,c=baros.Colin.val,k=baros.Kevin.val;
-  if(t>=85) return{verdict:"Fest-Alarm",         text:"Timmy ist da. Mit Lautsprecher. Aron schaut aus dem Fenster. Kevin übernimmt die Kuchenausgabe als FABE."};
-  if(t<=15&&a>=80) return{verdict:"Triumph",      text:"Kein Timmy. Aron wird Geschäftsführer. Colin nickt professionell. Kevin backt einen Kuchen."};
-  if(k>=80&&a<=30) return{verdict:"Die Überraschung", text:"Niemand hatte Kevin auf dem Radar. Er kommt aus der FABE-Betreuung, übernimmt das Mikrofon und redet 20 Minuten. Alle applaudieren verwirrt."};
-  if(c>=80&&t>=60) return{verdict:"Colin's Moment", text:"Timmy erscheint — Colin fängt ihn am Eingang ab. Zwei Stunden später sind sie befreundet. Aron ist erleichtert und leicht eifersüchtig."};
-  if(t>=50&&a<=50&&c<=50) return{verdict:"Totales Chaos", text:"Timmy kommt. Aron zögert. Colin schaut. Kevin fragt ob er helfen kann. Das Fest läuft irgendwie trotzdem weiter."};
-  if(a>=70&&t<60) return{verdict:"Knappe Sache",   text:"Timmy isst einen Kuchen und geht. Aron hält eine solide Rede. Der Blick vom Vorstand war positiv."};
-  if(k>=60&&c>=60) return{verdict:"Das unerwartete Duo", text:"Colin und Kevin arbeiten zusammen. Das Fest läuft wie am Schnürchen. Aron fragt sich wann das passiert ist."};
-  const s=[
-    {verdict:"Stabile Lage",      text:"Kein grosser Vorfall. Drei Reden, ein Fototermin, viele Kuchenteller. Aron bleibt wo er ist."},
-    {verdict:"Latente Spannung",  text:"Timmy hat nicht definitiv abgesagt. Die Stimmung ist angespannt. Aron isst nichts."},
-    {verdict:"Feiner Unterschied",text:"Alles läuft — aber nichts verändert sich. Aron überlebt. Kevin auch. Colin sowieso."},
-  ];
-  return s[Math.floor(Math.random()*s.length)];
-}
+/* ── GL BUILDER ── */
+const people=[
+  {id:'aron',  emoji:'😤',name:'Aron Reichenbach',   title:'Geschäftsleitung — Veteran',          tag:'Seit Jahren dabei. Wartet auf Beförderung.',          roles:['Geschäftsführer','Stv. GF','Leitung Kitas','Leitung Finanzen']},
+  {id:'timmy', emoji:'😬',name:'Timmy',               title:'Wildcardkandidat',                    tag:'Unklare Agenda. Bluetooth-Lautsprecher inklusive.',    roles:['Chief Chaos Officer','Kommunikation','Events','Strategie']},
+  {id:'colin', emoji:'🤝',name:'Colin',               title:'Der Stabile',                         tag:'Immer da. Niemand weiss genau wofür.',                 roles:['Leitung Projekte','HR','Qualität','Stv. GF']},
+  {id:'kevin', emoji:'🙃',name:'Kevin',               title:'Aufsteiger aus FABE-Betreuung',       tag:'Überraschungskandidat. Backt gute Kuchen.',            roles:['FABE-Leitung','Pädagogik','Kinder & Jugend','Verwaltung']},
+  {id:'extern',emoji:'🧳',name:'Externe Kandidatin',  title:'Kommt von McKinsey.',                 tag:'Hat einen MBA. Sagt viel «Synergien».',                roles:['Geschäftsführerin','Strategie','Transformation','Finanzen']},
+  {id:'vs',    emoji:'👔',name:'Vorstandsmitglied',   title:'Zieht die Fäden. Immer.',             tag:'Offiziell nur Aufsicht. Inoffiziell alles.',           roles:['Geschäftsführer a.i.','Strategie','Steuerung','Kontrolle']},
+];
+const selectedGL={};
 
-function spin(){
-  if(isSpinning) return;
-  isSpinning=true;
-  const area=document.getElementById('resultArea');
-  const hint=document.getElementById('wheelHint');
-  hint.style.opacity='0';
-  area.classList.add('fading');
-  area.classList.remove('active-result');
-  triggerWheel(1000+Math.random()*900,()=>{
-    const o=buildOutcome();
-    const fact=facts[Math.floor(Math.random()*facts.length)];
-    document.getElementById('verdict').textContent=o.verdict;
-    document.getElementById('resultText').textContent=o.text;
-    document.getElementById('factChip').textContent='✦ '+fact;
-    area.classList.remove('fading');
-    area.classList.add('active-result');
-    hint.style.opacity='1';
-    isSpinning=false;
+function buildCards(){
+  const grid=document.getElementById('glGrid');
+  people.forEach(p=>{
+    const card=document.createElement('div');
+    card.className='gl-card'; card.id='card_'+p.id;
+    card.innerHTML=`<div class="gl-avatar">${p.emoji}</div><div class="gl-info"><div class="gl-name">${p.name}</div><div class="gl-title-small">${p.title}</div><div class="gl-tag">${p.tag}</div><div class="role-selector" id="roles_${p.id}">${p.roles.map(r=>`<button class="role-btn" onclick="selectRole('${p.id}','${r}',this)">${r}</button>`).join('')}</div></div><div class="gl-right"><div class="gl-role-badge" id="badge_${p.id}">—</div><div class="gl-check" id="check_${p.id}"></div></div>`;
+    card.addEventListener('click',e=>{if(e.target.classList.contains('role-btn'))return;toggleGL(p.id);});
+    grid.appendChild(card);
   });
 }
+
+function toggleGL(id){
+  const card=document.getElementById('card_'+id),check=document.getElementById('check_'+id);
+  if(selectedGL[id]){delete selectedGL[id];card.classList.remove('selected');check.textContent='';document.getElementById('badge_'+id).textContent='—';document.querySelectorAll(`#roles_${id} .role-btn`).forEach(b=>b.classList.remove('active'));}
+  else{selectedGL[id]=people.find(p=>p.id===id).roles[0];card.classList.add('selected');check.textContent='✓';document.getElementById('badge_'+id).textContent=selectedGL[id];document.querySelector(`#roles_${id} .role-btn`).classList.add('active');}
+  const count=Object.keys(selectedGL).length;
+  document.getElementById('selectedCount').textContent=count===0?'Niemanden ausgewählt':`${count} Person${count>1?'en':''} ausgewählt`;
+  document.getElementById('generateBtn').disabled=count===0;
+}
+
+function selectRole(id,role,btn){selectedGL[id]=role;document.getElementById('badge_'+id).textContent=role;document.querySelectorAll(`#roles_${id} .role-btn`).forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
+function generateGL(){
+  const ids=Object.keys(selectedGL);
+  const res=document.getElementById('glResult');
+  res.classList.remove('visible'); res.style.animation='none';
+  void res.offsetWidth;
+  document.getElementById('glMembers').innerHTML=ids.map(id=>{const p=people.find(x=>x.id===id);return`<div class="gl-member-chip">${p.emoji} ${p.name} — <span>${selectedGL[id]}</span></div>`;}).join('');
+  const {title,statement,impacts}=analyzeGL(ids);
+  document.getElementById('glResultTitle').textContent=title;
+  document.getElementById('glStatement').textContent=statement;
+  document.getElementById('glImpacts').innerHTML=impacts.map(i=>`<div class="impact-row"><div class="impact-label">${i.label}</div><div class="impact-track"><div class="impact-fill" style="background:${i.color}" data-target="${i.val}"></div></div><div class="impact-val">${i.val}%</div></div>`).join('');
+  res.style.animation='fadeUp 0.8s ease forwards'; res.classList.add('visible');
+  setTimeout(()=>{res.querySelectorAll('.impact-fill').forEach(b=>b.style.width=b.dataset.target+'%');},200);
+  res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function analyzeGL(ids){
+  const has=id=>ids.includes(id);
+  if(has('timmy')&&has('extern')&&!has('aron'))return{title:'Die Disruptions-GL',statement:'McKinsey trifft Bluetooth-Lautsprecher. Die neue GL hat noch nie ein Kind gesehen, dafür ein ausgezeichnetes Powerpoint über «kinderzentrierte Synergiepotenziale». Alle 40 Kitas werden in «Innovation Hubs» umbenannt. Aron bewirbt sich bei der Konkurrenz.',impacts:[{label:'Chaos-Level',val:94,color:'#FF6B6B'},{label:'Buzzwords/Tag',val:88,color:'#9B6EA8'},{label:'Kita-Qualität',val:22,color:'#6AB4D0'},{label:'Budget',val:15,color:'#D4A84A'}]};
+  if(has('aron')&&has('vs')&&!has('timmy'))return{title:'Die Stille Machtübernahme',statement:'Aron ist Geschäftsführer — theoretisch. Der Vorstand hat nun Zugang zu allem und Aron unterschreibt was man ihm hinschiebt. Colin nickt. Kevin fragt ob er Kuchen mitbringen soll. familea läuft. Irgendwie.',impacts:[{label:'Aron-Zufriedenheit',val:41,color:'#D4A84A'},{label:'Machtkonzentration',val:96,color:'#FF6B6B'},{label:'Transparenz',val:18,color:'#6AB4D0'},{label:'Stabilität',val:72,color:'#2DBFB8'}]};
+  if(has('kevin')&&has('timmy'))return{title:'Die Überraschungs-GL',statement:'Kevin kommt aus der FABE-Betreuung direkt in die GL-Sitzung. Timmy hat den Kalender-Link falsch weitergeleitet. Trotzdem funktioniert es — weil beide eigentlich nett sind und niemand sonst aufgetaucht ist. familea hat jetzt die jüngste GL der Schweizer Sozialbranche.',impacts:[{label:'Überraschungsgrad',val:99,color:'#FF6B6B'},{label:'Erfahrung',val:14,color:'#D4A84A'},{label:'Motivation',val:91,color:'#2DBFB8'},{label:'Durchschnittsalter',val:31,color:'#9B6EA8'}]};
+  if(has('aron')&&has('colin')&&!has('timmy'))return{title:'Die Solide GL',statement:'Nichts explodiert. Alle Meetings beginnen pünktlich. Die 40+ Kitas laufen stabil. Aron macht endlich was er seit Jahren wollte. Colin ist zufrieden. Kevin ist jetzt offiziell «Kulinarischer Botschafter». Timmy hat nicht geantwortet.',impacts:[{label:'Stabilität',val:88,color:'#2DBFB8'},{label:'Kita-Qualität',val:84,color:'#6AB4D0'},{label:'Langeweile',val:61,color:'#9B6EA8'},{label:'Timmy-Risiko',val:8,color:'#FF6B6B'}]};
+  if(has('extern')&&!has('aron')&&!has('colin'))return{title:'Die McKinsey-GL',statement:'Die neue GF kennt keines der 800 Mitarbeitenden beim Namen. Die Kitas werden «neu ausgerichtet». Pflegefamilien erhalten ein Rebrand. Das Jubiläumsfest wird «familea Experience Day». Aron kündigt im Oktober.',impacts:[{label:'Effizienz',val:44,color:'#D4A84A'},{label:'Beratungskosten',val:97,color:'#FF6B6B'},{label:'Mitarbeiterzufriedenheit',val:19,color:'#6AB4D0'},{label:'Buzzwords',val:100,color:'#9B6EA8'}]};
+  if(has('timmy')&&has('aron'))return{title:'Die Unwahrscheinliche GL',statement:'Aron macht die Strategie. Timmy die Kommunikation. Es gibt täglich Spannungen aber auch täglich Ergebnisse. Die 800 Mitarbeitenden sind verwirrt aber motiviert. familea läuft auf Halbgas — aber mit sehr guter Playlist.',impacts:[{label:'Spannung intern',val:78,color:'#FF6B6B'},{label:'Kreativität',val:82,color:'#2DBFB8'},{label:'Vorhersehbarkeit',val:12,color:'#D4A84A'},{label:'Unterhaltungswert',val:99,color:'#9B6EA8'}]};
+  const names=ids.map(id=>people.find(p=>p.id===id).name);
+  return{title:'Die Unkonventionelle GL',statement:`${names.join(', ')} — eine Kombination die niemand auf dem Bingo-Zettel hatte. Die 800 Mitarbeitenden warten ab. Die 40 Kitas laufen weiter. Das Jubiläumsfest am Münsterplatz findet statt. Das ist das Wichtigste. Irgendwie.`,impacts:[{label:'Überraschungsgrad',val:Math.min(99,50+ids.length*8),color:'#D4A84A'},{label:'Kita-Stabilität',val:74,color:'#2DBFB8'},{label:'Einigkeit',val:Math.max(10,80-ids.length*10),color:'#6AB4D0'},{label:'Timmy-Risiko',val:ids.includes('timmy')?85:12,color:'#FF6B6B'}]};
+}
+
+buildCards();
 </script>
 
 </body>
